@@ -29,6 +29,7 @@ class CarState(CarStateBase):
     self.cachedParams = CachedParams()
     self.opParams = opParams()
     self.lkasHeartbit = None
+    self.accDashboard = None
 
   def update(self, cp, cp_cam):
     speed_adjust_ratio = self.cachedParams.get_float('jvePilot.settings.speedAdjustRatio', 5000)
@@ -91,6 +92,7 @@ class CarState(CarStateBase):
     ret.jvePilotCarState.leadDistanceRadarRatio = self.cachedParams.get_float(LEAD_RADAR_CONFIG[ret.jvePilotCarState.accFollowDistance], 1000) * inverse_speed_adjust_ratio
     ret.jvePilotCarState.buttonCounter = int(cp.vl["WHEEL_BUTTONS"]['COUNTER'])
     self.lkasHeartbit = cp_cam.vl["LKAS_HEARTBIT"]
+    self.accDashboard = cp.vl["DASHBOARD"]
 
     button_events = []
     for buttonType in CHECK_BUTTONS:
@@ -128,46 +130,55 @@ class CarState(CarStateBase):
 
   @staticmethod
   def get_can_parser(CP):
-    signals = [
-      # sig_name, sig_address, default
-      ("PRNDL", "GEAR", 0),
-      ("DOOR_OPEN_FL", "DOORS", 0),
-      ("DOOR_OPEN_FR", "DOORS", 0),
-      ("DOOR_OPEN_RL", "DOORS", 0),
-      ("DOOR_OPEN_RR", "DOORS", 0),
-      ("BRAKE_PRESSED_2", "BRAKE_2", 0),
-      ("ACCEL_134", "ACCEL_GAS_134", 0),
-      ("SPEED_LEFT", "SPEED_1", 0),
-      ("SPEED_RIGHT", "SPEED_1", 0),
-      ("WHEEL_SPEED_FL", "WHEEL_SPEEDS", 0),
-      ("WHEEL_SPEED_RR", "WHEEL_SPEEDS", 0),
-      ("WHEEL_SPEED_RL", "WHEEL_SPEEDS", 0),
-      ("WHEEL_SPEED_FR", "WHEEL_SPEEDS", 0),
-      ("STEER_ANGLE", "STEERING", 0),
-      ("STEERING_RATE", "STEERING", 0),
-      ("TURN_SIGNALS", "STEERING_LEVERS", 0),
-      ("ACC_STATUS_2", "ACC_2", 0),
-      ("HIGH_BEAM_FLASH", "STEERING_LEVERS", 0),
-      ("ACC_SPEED_CONFIG_KPH", "DASHBOARD", 0),
-      ("CRUISE_STATE", "DASHBOARD", 0),
-      ("TORQUE_DRIVER", "EPS_STATUS", 0),
-      ("TORQUE_MOTOR", "EPS_STATUS", 0),
-      ("LKAS_STATE", "EPS_STATUS", 1),
-      ("COUNTER", "EPS_STATUS", -1),
-      ("TRACTION_OFF", "TRACTION_BUTTON", 0),
-      ("SEATBELT_DRIVER_UNLATCHED", "SEATBELT_STATUS", 0),
-      ("COUNTER", "WHEEL_BUTTONS", -1),
-      ("ACC_RESUME", "WHEEL_BUTTONS", 0),
-      ("ACC_CANCEL", "WHEEL_BUTTONS", 0),
-      ("ACC_SPEED_INC", "WHEEL_BUTTONS", 0),
-      ("ACC_SPEED_DEC", "WHEEL_BUTTONS", 0),
-      ("ACC_FOLLOW_INC", "WHEEL_BUTTONS", 0),
-      ("ACC_FOLLOW_DEC", "WHEEL_BUTTONS", 0),
-      ("ACC_DISTANCE_CONFIG_2", "DASHBOARD", 0),
-      ("BLIND_SPOT_LEFT", "BLIND_SPOT_WARNINGS", 0),
-      ("BLIND_SPOT_RIGHT", "BLIND_SPOT_WARNINGS", 0),
-      ("TOGGLE_LKAS", "TRACTION_BUTTON", 0),
+    forward_acc_dashboard = [
+      ("ACC_DISTANCE_CONFIG_1", "DASHBOARD", 0),
+      ("SPEED_DIGITAL", "DASHBOARD", 0),
+      ("FORWARD_1", "DASHBOARD", 0),
+      ("FORWARD_2", "DASHBOARD", 0),
+      ("FORWARD_3", "DASHBOARD", 0),
+      ("FORWARD_4", "DASHBOARD", 0),
     ]
+
+    signals = [
+                # sig_name, sig_address, default
+                ("PRNDL", "GEAR", 0),
+                ("DOOR_OPEN_FL", "DOORS", 0),
+                ("DOOR_OPEN_FR", "DOORS", 0),
+                ("DOOR_OPEN_RL", "DOORS", 0),
+                ("DOOR_OPEN_RR", "DOORS", 0),
+                ("BRAKE_PRESSED_2", "BRAKE_2", 0),
+                ("ACCEL_134", "ACCEL_GAS_134", 0),
+                ("SPEED_LEFT", "SPEED_1", 0),
+                ("SPEED_RIGHT", "SPEED_1", 0),
+                ("WHEEL_SPEED_FL", "WHEEL_SPEEDS", 0),
+                ("WHEEL_SPEED_RR", "WHEEL_SPEEDS", 0),
+                ("WHEEL_SPEED_RL", "WHEEL_SPEEDS", 0),
+                ("WHEEL_SPEED_FR", "WHEEL_SPEEDS", 0),
+                ("STEER_ANGLE", "STEERING", 0),
+                ("STEERING_RATE", "STEERING", 0),
+                ("TURN_SIGNALS", "STEERING_LEVERS", 0),
+                ("ACC_STATUS_2", "ACC_2", 0),
+                ("HIGH_BEAM_FLASH", "STEERING_LEVERS", 0),
+                ("ACC_SPEED_CONFIG_KPH", "DASHBOARD", 0),
+                ("CRUISE_STATE", "DASHBOARD", 0),
+                ("TORQUE_DRIVER", "EPS_STATUS", 0),
+                ("TORQUE_MOTOR", "EPS_STATUS", 0),
+                ("LKAS_STATE", "EPS_STATUS", 1),
+                ("COUNTER", "EPS_STATUS", -1),
+                ("TRACTION_OFF", "TRACTION_BUTTON", 0),
+                ("SEATBELT_DRIVER_UNLATCHED", "SEATBELT_STATUS", 0),
+                ("COUNTER", "WHEEL_BUTTONS", -1),
+                ("ACC_RESUME", "WHEEL_BUTTONS", 0),
+                ("ACC_CANCEL", "WHEEL_BUTTONS", 0),
+                ("ACC_SPEED_INC", "WHEEL_BUTTONS", 0),
+                ("ACC_SPEED_DEC", "WHEEL_BUTTONS", 0),
+                ("ACC_FOLLOW_INC", "WHEEL_BUTTONS", 0),
+                ("ACC_FOLLOW_DEC", "WHEEL_BUTTONS", 0),
+                ("ACC_DISTANCE_CONFIG_2", "DASHBOARD", 0),
+                ("BLIND_SPOT_LEFT", "BLIND_SPOT_WARNINGS", 0),
+                ("BLIND_SPOT_RIGHT", "BLIND_SPOT_WARNINGS", 0),
+                ("TOGGLE_LKAS", "TRACTION_BUTTON", 0),
+              ] + forward_acc_dashboard
 
     checks = [
       # sig_address, frequency
@@ -208,11 +219,11 @@ class CarState(CarStateBase):
     ]
 
     signals = [
-      # sig_name, sig_address, default
-      ("COUNTER", "LKAS_COMMAND", -1),
-      ("CAR_MODEL", "LKAS_HUD", -1),
-      ("LKAS_LANE_LINES", "LKAS_HUD", -1),
-    ] + forward_lkas_heartbit_signals
+                # sig_name, sig_address, default
+                ("COUNTER", "LKAS_COMMAND", -1),
+                ("CAR_MODEL", "LKAS_HUD", -1),
+                ("LKAS_LANE_LINES", "LKAS_HUD", -1),
+              ] + forward_lkas_heartbit_signals
 
     checks = [
       ("LKAS_COMMAND", 100),
