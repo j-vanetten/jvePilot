@@ -131,12 +131,12 @@ class CarState(CarStateBase):
   @staticmethod
   def get_can_parser(CP):
     forward_acc_dashboard = [
-      ("ACC_DISTANCE_CONFIG_1", "DASHBOARD", 0),
-      ("SPEED_DIGITAL", "DASHBOARD", 0),
-      ("FORWARD_1", "DASHBOARD", 0),
-      ("FORWARD_2", "DASHBOARD", 0),
-      ("FORWARD_3", "DASHBOARD", 0),
-      ("FORWARD_4", "DASHBOARD", 0),
+      ("ACC_DISTANCE_CONFIG_1", "DASHBOARD", -1),
+      ("SPEED_DIGITAL", "DASHBOARD", -1),
+      ("FORWARD_1", "DASHBOARD", -1),
+      ("FORWARD_2", "DASHBOARD", -1),
+      ("FORWARD_3", "DASHBOARD", -1),
+      ("FORWARD_4", "DASHBOARD", -1),
     ]
 
     signals = [

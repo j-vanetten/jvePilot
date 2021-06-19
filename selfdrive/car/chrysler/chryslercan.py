@@ -64,6 +64,6 @@ def create_wheel_buttons_command(cc, packer, counter, button, value):
 def create_acc_dashboard(packer, acc_speed_ms, acc_dashboard):
   # DASHBOARD (501) ACC Dashboard
   values = acc_dashboard.copy()  # forward what we parsed
-  values["ACC_SPEED_CONFIG_KPH"] = int(acc_speed_ms * CV.MS_TO_KPH)
-  values["ACC_SPEED_CONFIG_MPH"] = int(acc_speed_ms * CV.MS_TO_MPH),
+  values["ACC_SPEED_CONFIG_KPH"] = int(round(acc_speed_ms * CV.MS_TO_KPH))
+  values["ACC_SPEED_CONFIG_MPH"] = int(round(acc_speed_ms * CV.MS_TO_MPH))
   return packer.make_can_msg("DASHBOARD", 0, values)

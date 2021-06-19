@@ -83,8 +83,10 @@ class CarController():
         new_msg = create_wheel_buttons_command(self, self.packer, button_counter + 1, button_to_press, True)
         can_sends.append(new_msg)
 
-    new_msg = create_acc_dashboard(self.packer, c.hudControl.setSpeed, CS.accDashboard)
-    can_sends.append(new_msg)
+    if CS.accDashboard["FORWARD_4"] != -1:
+      CS.accDashboard["FORWARD_4"] = -1  # wait for next signal
+      new_msg = create_acc_dashboard(self.packer, c.hudControl.setSpeed, CS.accDashboard)
+      can_sends.append(new_msg)
 
     frame = CS.lkas_counter
     if self.prev_frame != frame:
