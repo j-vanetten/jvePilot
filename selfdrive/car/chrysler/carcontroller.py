@@ -1,6 +1,6 @@
 from selfdrive.car import apply_toyota_steer_torque_limits
 from selfdrive.car.chrysler.chryslercan import create_lkas_hud, create_lkas_command, \
-                                               create_wheel_buttons_command, create_lkas_heartbit
+  create_wheel_buttons_command, create_lkas_heartbit
 from selfdrive.car.chrysler.values import CAR, CarControllerParams
 from opendbc.can.packer import CANPacker
 from selfdrive.config import Conversions as CV
@@ -100,7 +100,7 @@ class CarController():
                                                    CS.out.steeringTorqueEps, CarControllerParams)
     self.steer_rate_limited = new_steer != apply_steer
 
-    if CS.out.vEgo > (CS.CP.minSteerSpeed - 0.5):  # TODO: Find a better way to identify when we are going fast enough
+    if CS.torqStatus > 0:
       self.gone_fast_yet = True
     elif self.car_fingerprint in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
       self.gone_fast_yet = CS.lkasActive  # keep active as long as the vehicle can still be controlled

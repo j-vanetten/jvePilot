@@ -30,6 +30,7 @@ class CarState(CarStateBase):
     self.opParams = opParams()
     self.lkasHeartbit = None
     self.lkasActive = False
+    self.torqStatus = 0
 
   def update(self, cp, cp_cam):
     speed_adjust_ratio = self.cachedParams.get_float('jvePilot.settings.speedAdjustRatio', 5000)
@@ -92,6 +93,7 @@ class CarState(CarStateBase):
     ret.jvePilotCarState.buttonCounter = int(cp.vl["WHEEL_BUTTONS"]['COUNTER'])
     self.lkasHeartbit = cp_cam.vl["LKAS_HEARTBIT"]
     self.lkasActive = bool(cp.vl["EPS_STATUS"]["LKAS_ACTIVE"])
+    self.torqStatus = bool(cp.vl["EPS_STATUS"]["TORQ_STATUS"])
     ret.steerError = ret.steerError or (not self.lkasActive and ret.vEgo > self.CP.minSteerSpeed)
 
     button_events = []
@@ -170,6 +172,7 @@ class CarState(CarStateBase):
       ("BLIND_SPOT_RIGHT", "BLIND_SPOT_WARNINGS", 0),
       ("TOGGLE_LKAS", "TRACTION_BUTTON", 0),
       ("LKAS_ACTIVE", "EPS_STATUS", 0),
+      ("TORQ_STATUS", "EPS_STATUS", 0),
     ]
 
     checks = [
