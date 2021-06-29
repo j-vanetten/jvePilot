@@ -29,6 +29,7 @@ class CarState(CarStateBase):
     self.cachedParams = CachedParams()
     self.opParams = opParams()
     self.lkasHeartbit = None
+    self.lkasActive = False
 
   def update(self, cp, cp_cam):
     speed_adjust_ratio = self.cachedParams.get_float('jvePilot.settings.speedAdjustRatio', 5000)
@@ -75,8 +76,7 @@ class CarState(CarStateBase):
     ret.steeringTorque = cp.vl["EPS_STATUS"]["TORQUE_DRIVER"]
     ret.steeringTorqueEps = cp.vl["EPS_STATUS"]["TORQUE_MOTOR"]
     ret.steeringPressed = abs(ret.steeringTorque) > STEER_THRESHOLD
-    steer_state = cp.vl["EPS_STATUS"]["LKAS_STATE"]
-    ret.steerError = steer_state == 4 or (min_steer_check and steer_state == 0 and ret.vEgo > self.CP.minSteerSpeed)
+    ret.steerError = bool(cp.vl["EPS_STATUS"]["LKAS_STEER_FAULT"])
 
     ret.genericToggle = bool(cp.vl["STEERING_LEVERS"]["HIGH_BEAM_FLASH"])
 
@@ -91,6 +91,8 @@ class CarState(CarStateBase):
     ret.jvePilotCarState.leadDistanceRadarRatio = self.cachedParams.get_float(LEAD_RADAR_CONFIG[ret.jvePilotCarState.accFollowDistance], 1000) * inverse_speed_adjust_ratio
     ret.jvePilotCarState.buttonCounter = int(cp.vl["WHEEL_BUTTONS"]['COUNTER'])
     self.lkasHeartbit = cp_cam.vl["LKAS_HEARTBIT"]
+    self.lkasActive = bool(cp.vl["EPS_STATUS"]["LKAS_ACTIVE"])
+    ret.steerError = ret.steerError or (not self.lkasActive and ret.vEgo > self.CP.minSteerSpeed)
 
     button_events = []
     for buttonType in CHECK_BUTTONS:
@@ -152,7 +154,7 @@ class CarState(CarStateBase):
       ("CRUISE_STATE", "DASHBOARD", 0),
       ("TORQUE_DRIVER", "EPS_STATUS", 0),
       ("TORQUE_MOTOR", "EPS_STATUS", 0),
-      ("LKAS_STATE", "EPS_STATUS", 1),
+      ("LKAS_STEER_FAULT", "EPS_STATUS", 0),
       ("COUNTER", "EPS_STATUS", -1),
       ("TRACTION_OFF", "TRACTION_BUTTON", 0),
       ("SEATBELT_DRIVER_UNLATCHED", "SEATBELT_STATUS", 0),
@@ -167,6 +169,7 @@ class CarState(CarStateBase):
       ("BLIND_SPOT_LEFT", "BLIND_SPOT_WARNINGS", 0),
       ("BLIND_SPOT_RIGHT", "BLIND_SPOT_WARNINGS", 0),
       ("TOGGLE_LKAS", "TRACTION_BUTTON", 0),
+      ("LKAS_ACTIVE", "EPS_STATUS", 0),
     ]
 
     checks = [
