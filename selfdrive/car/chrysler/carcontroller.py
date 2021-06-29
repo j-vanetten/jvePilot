@@ -100,11 +100,10 @@ class CarController():
                                                    CS.out.steeringTorqueEps, CarControllerParams)
     self.steer_rate_limited = new_steer != apply_steer
 
-    if CS.out.vEgo > (CS.CP.minSteerSpeed - 0.5):  # for command high bit
+    if CS.out.vEgo > (CS.CP.minSteerSpeed - 0.5):  # TODO: Find a better way to identify when we are going fast enough
       self.gone_fast_yet = True
     elif self.car_fingerprint in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
-      if CS.out.vEgo < (CS.CP.minSteerSpeed - 3.0):
-        self.gone_fast_yet = False  # < 14.5m/s stock turns off this bit, but fine down to 13.5
+      self.gone_fast_yet = CS.lkasActive  # keep active as long as the vehicle can still be controlled
 
     lkas_active = CS.lkasActive and enabled
     if not lkas_active:
