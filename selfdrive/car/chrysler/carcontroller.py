@@ -25,6 +25,7 @@ class CarController():
     self.prev_frame = -1
     self.hud_count = 0
     self.car_fingerprint = CP.carFingerprint
+    self.gone_fast_yet = False
     self.steer_rate_limited = False
     self.last_button_counter = -1
     self.pause_control_until_frame = 0
@@ -98,6 +99,11 @@ class CarController():
                                                    CS.out.steeringTorqueEps, CarControllerParams)
     self.steer_rate_limited = new_steer != apply_steer
 
+    if CS.torqStatus > 1 or CS.lkasActive:
+      self.gone_fast_yet = True
+    elif self.car_fingerprint in (CAR.PACIFICA_2019_HYBRID, CAR.PACIFICA_2020, CAR.JEEP_CHEROKEE_2019):
+      self.gone_fast_yet = False
+
     lkas_active = CS.lkasActive and enabled
     if not lkas_active:
       apply_steer = 0
@@ -116,8 +122,7 @@ class CarController():
         can_sends.append(new_msg)
         self.hud_count += 1
 
-    lkas_controllable = CS.torqStatus > 0 or CS.lkasActive
-    new_msg = create_lkas_command(self.packer, int(apply_steer), lkas_controllable, frame)
+    new_msg = create_lkas_command(self.packer, int(apply_steer), self.gone_fast_yet, frame)
     can_sends.append(new_msg)
 
     return can_sends

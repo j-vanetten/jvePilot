@@ -92,7 +92,7 @@ class CarState(CarStateBase):
     ret.jvePilotCarState.buttonCounter = int(cp.vl["WHEEL_BUTTONS"]['COUNTER'])
     self.lkasHeartbit = cp_cam.vl["LKAS_HEARTBIT"]
     self.lkasActive = bool(cp.vl["EPS_STATUS"]["LKAS_ACTIVE"])
-    self.torqStatus = bool(cp.vl["EPS_STATUS"]["TORQ_STATUS"])
+    self.torqStatus = cp.vl["EPS_STATUS"]["TORQ_STATUS"]
 
     button_events = []
     for buttonType in CHECK_BUTTONS:
